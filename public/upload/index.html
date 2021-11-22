@@ -1,0 +1,129 @@
+<!--suppress ALL -->
+<!DOCTYPE html>
+  
+  <!-- Homepage -->
+  
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+  <style>
+  </style>
+    <center>
+    <h1>Upload Media</h1><br><br>
+    <form action="/uploading" method="post" enctype="multipart/form-data" id="mediaUpload">
+      <label>Images:</label>
+      <input type="file" accept="image/*" name="photos" multiple id="photosInput">
+      <br>
+      <label>Videos:</label>
+      <input type="file" accept="video/*" name="videos" multiple id="videosInput">
+      <br><br><br>
+      <input style="position:relative;top:50px;" type="submit" value="Submit!">
+    </form>
+    <br clear="all"><br><br>
+    <div id="files"></div>
+    </center>
+    <div id="messageDiv" style="z-index:-10;"></div>
+    <script>
+      document.getElementById("messageDiv").style.position="absolute";
+      document.getElementById("messageDiv").style.top=0;
+      document.getElementById("messageDiv").style.left=0;
+      document.getElementById("messageDiv").style.width=window.innerWidth+"px";
+      document.getElementById("messageDiv").style.height=window.innerHeight+"px";
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has("destroy")){
+        var delM = document.createElement("p");
+        delM.style.position = "relative";
+        delM.style.top = window.innerHeight*0.5+"px";
+        delM.style.fontSize = "45px";
+        delM.id="deleteMessage";
+        delM.append("Deleted :)");
+
+        var center = document.createElement("center");
+        document.getElementById("messageDiv").appendChild(center);
+        center.appendChild(delM);
+        setTimeout(()=>{
+          var iter=0;
+          var interval = setInterval(()=>{
+            if (iter<=100){
+              document.getElementById("deleteMessage").style.opacity=100-1*iter+"%";
+              iter++;
+            } else {
+              clearInterval(interval);
+            }
+          },10)
+        },3000)
+      } else if (urlParams.has("badName")){
+        var badNameM = document.createElement("p");
+        badNameM.style.position = "relative";
+        badNameM.style.top = window.innerHeight*0.5+"px";
+        badNameM.style.fontSize = "45px";
+        badNameM.id="badNameMessage";
+        badNameM.append("Please enter a name without special characters! ALSO IF U HIT SUBMIT WITHOUT ENTERING A NAME YOU R POOPY enter a name this time okay"); //i didn't say numbers were okay cuz idk how they are affected by .toUpperCase()/.toLowerCase
+
+        var center = document.createElement("center");
+        document.getElementById("messageDiv").appendChild(center);
+        center.appendChild(badNameM);
+        setTimeout(()=>{
+          var iter=0;
+          var interval = setInterval(()=>{
+            if (iter<=100){
+              document.getElementById("badNameMessage").style.opacity=100-1*iter+"%";
+              iter++;
+            } else {
+              clearInterval(interval);
+            }
+          },10)
+        },4000)
+      }
+
+      const specialChars = "!@#$%^&*()-=_+[]{}|;':\".,<>/\?`~\\";
+      function isNoSpChar(str) {
+        for (var i = 0; i < str.length; i++) {
+          if (specialChars.indexOf(str.charAt(i)) !== -1) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      document.getElementById("photosInput").onchange = ()=>{
+        document.getElementById("files").innerHTML = "";
+        for (var i=0;i<document.getElementById("photosInput").files.length;i++){
+          var p = document.createElement("p");
+          p.append(document.getElementById("photosInput").files[i].name);
+          p.style.color = "darkBlue";
+          p.id = "nameText" + i;
+          document.getElementById("files").appendChild(p);
+
+          var name = document.createElement("input");
+          name.type = "hidden";
+          name.value = document.getElementById("photosInput").files[i].name;
+          name.name = "name" + i;
+          name.id = "nameInput" + i;
+          document.getElementById("mediaUpload").appendChild(name)
+
+          p.addEventListener("click", function(){
+            function recurseNewName(e){
+              var newName = prompt("What do you want to rename this file to?");
+              if (newName !== null && newName.trim() !== "" && isNoSpChar(newName)){
+                var oldN = document.getElementById("nameInput"+e.id.substring(8)).value;
+                var ext = oldN.substring(oldN.indexOf("."));
+                document.getElementById("nameInput"+e.id.substring(8)).value = "";
+                document.getElementById("nameInput"+e.id.substring(8)).value = newName+ext;
+                document.getElementById(e.id).innerHTML = "";
+                document.getElementById(e.id).append(newName+ext);
+              } else {
+                recurseNewName(e);
+              }
+            };
+            recurseNewName(this);
+          })
+        }
+      }
+    </script>
+</body>
+</html>

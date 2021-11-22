@@ -1,0 +1,55 @@
+<!--suppress ALL -->
+<!DOCTYPE html>
+  
+  <!-- Homepage -->
+  
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+  <div id="one">
+    <button id="uploader">Upload</button>
+  </div>
+  <div id="two">
+    <button id="downloader">Download</button>
+  </div>
+  <center>
+  <h1>Media Transferer</h1>
+  <p>Created by Michael Zhang</p>
+  <br clear="all"><br><br>
+  <h3>Go to:</h3>
+  </center>
+  <style>
+    div{
+      position:absolute;
+      left:0;
+      top:0;
+    }
+    button{
+      position:relative;
+    }
+    #uploader{
+      float:right;
+    }
+  </style>
+  <style>
+  </style>
+  <script>
+    const gebi = function(e){return document.getElementById(e)};
+    gebi("one").style.width=window.innerWidth*0.5+"px";gebi("one").style.height=window.innerHeight+"px";
+    gebi("two").style.width=window.innerWidth*0.5+"px";gebi("two").style.height=window.innerHeight+"px";
+    gebi("two").style.left=window.innerWidth*0.5+"px";
+    gebi("uploader").style.top=window.innerHeight*0.35+"px";
+    gebi("downloader").style.top=window.innerHeight*0.35+"px";
+    gebi("uploader").addEventListener("click",()=>{
+      window.location = "./upload"
+    })
+    gebi("downloader").addEventListener("click",()=>{
+      window.location = "./download"
+    })
+  </script>
+</body>
+</html>
