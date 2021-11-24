@@ -58,7 +58,7 @@
           }
         }
         
-        var createDownloadButton = function(file){
+        var createButtons = function(file){
           var buttonE = document.createElement("button");
           buttonE.append("Download");
           buttonE.style.height = "25px";
@@ -74,6 +74,29 @@
             downloadMedia.click();
             document.body.removeChild(downloadMedia);
           })
+          
+          var buttonD = document.createElement("button");
+          buttonD.append("Download");
+          buttonD.style.height = "25px";
+          buttonD.style.position = "relative";
+          buttonD.style.backgroundColor = "red";
+          heights+=35;
+          buttonD.style.top = heights+"px";
+          document.getElementById("two").appendChild(buttonD);
+          buttonE.addEventListener("click", function(){
+            var formSubmit = document.createElement("form");
+            formSubmit.action = "/destroy";
+            formSubmit.method = "post";
+            formSubmit.enctype = "multipart/form-data";
+            
+            var fileName = document.createElement("input");
+            fileName.type = "hidden";
+            fileName.name = "fileName";
+            fileName.value = file;
+            
+            formSubmit.appendChild(fileName);
+            document.getElementById("two").appendChild(formSubmit);
+            formSubmit.submit();
         }
         
         var heights=0;
@@ -105,7 +128,7 @@
             desc.append("Original size: "+imgE.naturalWidth+"x"+imgE.naturalHeight);
             desc.append(document.createElement("br"));
             desc.append("Type: "+ type);
-            createDownloadButton(file);
+            createButtons(file);
           }
         } else if (getFileType(type.toLowerCase())==="video"){
           //FUKING GLITCHED
@@ -145,7 +168,7 @@
                 desc.append("Original size: "+videoE.naturalWidth+"x"+videoE.naturalHeight);
                 desc.append(document.createElement("br"));
                 desc.append("Type: "+ type);
-                createDownloadButton(file);
+                createButtons(file);
                 clearInterval(inter);
               }
             },250)
