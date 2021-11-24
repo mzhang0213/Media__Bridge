@@ -58,6 +58,17 @@ app.get("/getFiles", (req, res)=>{
     res.send(JSON.stringify(json));
 })
 
+app.get("/destroy", upload.none(), (req,res)=>{
+  //file: req.body.fileName
+  try {
+    fs.unlinkSync(__dirname+"/uploads/"+req.body.fileName);
+  } catch(e) {
+    console.log("awejfiowj file del err: " + e);
+    res.redirect("./uploads/?destroy=fail");
+  }
+  res.redirect("./uploads/?destroy=true");
+})
+
 app.get("/uploads/*", (req, res)=>{
     res.sendFile(__dirname+req.url.substring(req.url.indexOf("/uploads/")));
 });
