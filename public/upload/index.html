@@ -1,7 +1,7 @@
 <!--suppress ALL -->
 <!DOCTYPE html>
   
-  <!-- Homepage -->
+  <!-- Upload -->
   
 <html lang="en">
 <head>
@@ -22,6 +22,7 @@
       <input type="file" accept="video/*" name="videos" multiple id="videosInput">
       <br><br><br>
       <input style="position:relative;top:50px;" type="submit" value="Submit!">
+      <input type="hidden" name="changes" id="changesE">
     </form>
     <br clear="all"><br><br>
     <div id="files"></div>
@@ -99,23 +100,44 @@
           p.id = "nameText" + i;
           document.getElementById("files").appendChild(p);
 
-          var name = document.createElement("input");
-          name.type = "hidden";
-          name.value = document.getElementById("photosInput").files[i].name;
-          name.name = "name" + i;
-          name.id = "nameInput" + i;
-          document.getElementById("mediaUpload").appendChild(name)
+          //display: screenshot123.jpg
+          //newname="fsda"
+          //renames=""
+          //contents={};
+          //oldN=screenshot123.jpg
 
+          //display: fdsa.jpg
+          //newname="asdf"
+          //renames="{screenshot123.jpg: fdsa.jpg}"
+          //contents={screenshot123.jpg: fdsa.jpg}
+          //oldN=fdsa.jpg
+          //object.keys = ["screenshot123.jpg"]
+          //object.values = ["fdsa.jpg"]
           p.addEventListener("click", function(){
             function recurseNewName(e){
               var newName = prompt("What do you want to rename this file to?");
               if (newName !== null && newName.trim() !== "" && isNoSpChar(newName)){
-                var oldN = document.getElementById("nameInput"+e.id.substring(8)).value;
+                var renames = document.getElementById("changesE").value;
+                var contents = JSON.parse(renames);
+                var oldN = e.innerHTML;
                 var ext = oldN.substring(oldN.indexOf("."));
-                document.getElementById("nameInput"+e.id.substring(8)).value = "";
-                document.getElementById("nameInput"+e.id.substring(8)).value = newName+ext;
-                document.getElementById(e.id).innerHTML = "";
-                document.getElementById(e.id).append(newName+ext);
+                var renamedObj = "{";
+                for (var a=0;a<Object.values(contents).length;a++){
+                  if (Object.values(contents)[i]===oldN){ //you want to see if the old name you are currently on is the same as an old name in the file w/ renamed
+                    //rename already exists @ pos i
+                    renamedObj += Object.keys(contents)[i]+":"+newName+ext;
+                  } else {
+                    renamedObj += oldN+":"+newName+ext;
+                  }
+                  renamedObj+=","
+                }
+                renamedObj=renamedObj.substring(0,renamedObj.length-1); //remove the extra comma
+                renamedObj+="}";
+                
+                document.getElementById("changesE").value = "";
+                document.getElementById("changesE").value = renamedObj;
+                e.innerHTML = "";
+                e.append(newName+ext);
               } else {
                 recurseNewName(e);
               }

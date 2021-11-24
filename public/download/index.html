@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<!-- Downloads -->
+
+<html>
+  <head>
+    <title></title>
+    <link href='https://fonts.googleapis.com/css?family=Cabin' rel='stylesheet'>
+  </head>
+  <body>
+    
+    <font style="font-family: 'Cabin';">
+      <h1 style="margin-left:10px;position:absolute;">Download Files!</h1>
+      <br>
+      <h3 style="margin-left:10px;position:absolute;top:125px">/uploads</h3>
+      <br clear="all">
+      <div id="one"></div>
+      <div id="two"></div>
+    </font>
+    <style>
+      html{
+        width:0;
+        height:0;
+      }
+      body{
+        width:0;
+        height:0;
+      }
+      div{
+        position:absolute;
+        top:0;
+        left:0;
+        margin:0;
+        padding:0;
+      }
+      #two{
+        border-left:1px black solid;
+      }
+    </style>
+    <script>
+      const gebi = function(e){return document.getElementById(e)};
+      gebi("one").style.width=window.innerWidth*0.5-1+"px";gebi("one").style.height=window.innerHeight+"px";
+      gebi("two").style.width=window.innerWidth*0.5-1+"px";gebi("two").style.height=window.innerHeight+"px";
+      gebi("two").style.left=window.innerWidth*0.5-1+"px";
+      gebi("one").style.right=0;
+      gebi("one").style.bottom=0;
+      gebi("two").style.right=0;
+      gebi("two").style.bottom=0;
+      
+      const loadMediaPlayer = function(file, type){ //file is the filename, type is png or jpg
+        document.getElementById("two").innerHTML = "";
+        var getFileType = function(type){
+          if (type ==="png"||type==="jpg"||type==="jpeg"||type==="heif"||type==="gif"||type==="bmp"||type==="tiff"){
+            return "image";
+          } else {
+            console.log("presumed video: " + type);
+            return "video";
+          }
+        }
+        
+        var createDownloadButton = function(file){
+          var buttonE = document.createElement("button");
+          buttonE.append("Download");
+          buttonE.style.height = "25px";
+          buttonE.style.position = "relative";
+          heights+=25;
+          buttonE.style.top = heights+"px";
+          document.getElementById("two").appendChild(buttonE);
+          buttonE.addEventListener("click", function(){
+          var downloadMedia = document.createElement("a")
+            downloadMedia.href = "http://"+document.location.host+"/uploads/"+file;
+            downloadMedia.download = file.substring(0,file.indexOf("."));
+            document.body.appendChild(downloadMedia);
+            downloadMedia.click();
+            document.body.removeChild(downloadMedia);
+          })
+        }
+        
+        var heights=0;
+        if (getFileType(type.toLowerCase())==="image"){
+          var container = document.createElement("div");
+          var imgE = new Image();
+          imgE.src = "http://"+document.location.host+"/uploads/"+file;
+          imgE.onload = function(){
+            heights = 0;
+            imgE.style.width = imgE.naturalWidth*0.5+"px";
+            imgE.style.height = imgE.naturalHeight*0.5+"px";
+
+            var desc = document.createElement("p");
+            desc.style.margin=0;
+            desc.style.padding=0;
+            desc.style.height=30+"px";
+            desc.style.fontSize=25+"px";
+            container.style.width=document.getElementById("two").width+"px";
+            container.style.height=70+imgE.naturalHeight/2+"px";
+            container.style.left=0;
+            container.style.position="absolute";
+            container.style.top=heights+"px";
+            heights+=70+imgE.naturalHeight/2;
+
+            container.appendChild(imgE);
+            container.appendChild(desc);
+            document.getElementById("two").appendChild(container);
+            document.getElementById("two").appendChild(document.createElement("br"));
+            desc.append("Original size: "+imgE.naturalWidth+"x"+imgE.naturalHeight);
+            desc.append(document.createElement("br"));
+            desc.append("Type: "+ type);
+            createDownloadButton(file);
+          }
+        } else if (getFileType(type.toLowerCase())==="video"){
+          //FUKING GLITCHED
+          var container = document.createElement("div");
+          var videoE = document.createElement("video");
+          var source = document.createElement("source");
+          
+          source.src = "http://"+document.location.host+"/uploads/"+file;
+          videoE.controls = true;
+          videoE.perload = "auto";
+          videoE.appendChild(source);
+
+          videoE.load();
+          videoE.addEventListener("loadedmetadata", function(){
+            var inter = setInterval(function(){
+              if (videoE.readyState===4){
+                heights = 0;
+                videoE.style.width = videoE.naturalWidth*0.5+"px";
+                videoE.style.height = videoE.naturalHeight*0.5+"px";
+      
+                var desc = document.createElement("p");
+                desc.style.margin=0;
+                desc.style.padding=0;
+                desc.style.height=30+"px";
+                desc.style.fontSize=25+"px";
+                container.style.width=document.getElementById("two")+"px";
+                container.style.height=70+videoE.naturalHeight/2+"px";
+                container.style.left=0;
+                container.style.position="absolute";
+                container.style.top=heights+"px";
+                heights+=70+videoE.naturalHeight/2;
+      
+                container.appendChild(videoE);
+                container.appendChild(desc);
+                document.getElementById("two").appendChild(container);
+                document.getElementById("two").appendChild(document.createElement("br"));
+                desc.append("Original size: "+videoE.naturalWidth+"x"+videoE.naturalHeight);
+                desc.append(document.createElement("br"));
+                desc.append("Type: "+ type);
+                createDownloadButton(file);
+                clearInterval(inter);
+              }
+            },250)
+          })
+        } else {
+          console.log("bad mimetype recognition reeeeeeee")
+        }
+      }
+      
+      var files = [];
+      var req = new XMLHttpRequest();
+      req.open("GET", "http://"+document.location.host+"/getFiles");
+      req.send();
+      req.onload = function(){
+        if (req.readyState === 4){
+          var json = JSON.parse(req.responseText);
+  		    for (var i=0;i<json.files.length;i++){
+  		      files.push(json.files[i]);
+            console.log(files);
+  		    }
+          var heights = 175;
+          for (var i=0;i<files.length;i++){
+            var p = document.createElement("p");
+            p.style.fontSize="20px";
+            p.style.color="blue";
+            p.style.margin = 0;
+            p.style.marginLeft = "40px";
+            p.style.padding = 0;
+            p.style.width = 0;
+            p.style.top=heights+"px";
+            p.style.position="relative";
+            p.append(files[i]);
+            document.getElementById("one").appendChild(p);
+            p.addEventListener("click", function(){
+              loadMediaPlayer(this.innerHTML, this.innerHTML.substring(this.innerHTML.indexOf(".")+1));
+            })
+            heights+=22;
+          }
+  		  } else {
+  		    console.log("not ready err")
+  		  }
+      }
+    </script>
+  </body>
+</html>
