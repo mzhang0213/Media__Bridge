@@ -9,20 +9,13 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
         
-        console.log(req);
-        console.log(Object.keys(req.body));
-        console.log(Object.values(req.body));
-        if(Object.keys(req.body).length!==0){
-            //has files
-            //see if current file has a rename
-            for (var i=0;i<Object.value(req.body).length;i++){
-                if (Object.value(req.body)[i]!==file.originalname){
-                    //renamed
-                    uniqueName = file.originalname;
+        if (req.body.changes!==""){
+            var changes = JSON.parse(req.body.changes)
+            for (var i=0;i<Object.values(changes);i++){
+                if (Object.keys(changes)[i]===file.originalname){
+                    uniqueName = Object.values(changes)[i]
                 }
             }
-        } else {
-            return cb(new Error("multer no file"));
         }
         uniqueName = uniqueName.substring(uniqueName.length-10,uniqueName.length) + "."+ file.mimetype.substring(file.mimetype.indexOf("/")+1).toLowerCase();
         cb(null, uniqueName);
