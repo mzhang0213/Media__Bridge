@@ -50,6 +50,33 @@
     gebi("downloader").addEventListener("click",()=>{
       window.location = "./download"
     })
+    if (urlParams.has("destroy")){
+      var delM = document.createElement("p");
+      delM.style.position = "relative";
+      delM.style.top = window.innerHeight*0.5+"px";
+      delM.style.fontSize = "45px";
+      delM.id="deleteMessage";
+      if (urlParams.get("destroy")==="true"){
+        delM.append("File Deleted :)");
+      } else if (urlParams.get("destroy")==="fail"){
+        delM.append("File delete faliure sorry :(:(");
+      }
+
+      var center = document.createElement("center");
+      document.getElementById("messageDiv").appendChild(center);
+      center.appendChild(delM);
+      setTimeout(()=>{
+        var iter=0;
+        var interval = setInterval(()=>{
+          if (iter<=100){
+            document.getElementById("deleteMessage").style.opacity=100-1*iter+"%";
+            iter++;
+          } else {
+            clearInterval(interval);
+          }
+        },10)
+      },3000)
+    }
   </script>
 </body>
 </html>
