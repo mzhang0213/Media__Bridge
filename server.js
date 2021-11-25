@@ -32,17 +32,13 @@ function isNoSpChar(str) {
 app.post('/uploading', (req, res) => {
     upload.fields([{name:"photos"},{name:"videos"}])(req, res, (multerErr)=>{
     if (multerErr){
-      console.log("reeeeeeee" + multerErr);
     } else {
         var files = fs.readdirSync("./uploads/");
-        console.log(req.body);
         var changes = req.body.changes===""?"":JSON.parse(req.body.changes);
-        console.log(changes);
         for (var a=0;a<files.length;a++){
             var b=0;
             do{
                 if((changes!=="")&&files[a].substring(8)===changes[b].originalName&&files[a].indexOf("tempfile")==0){
-                    console.log("\n","entered")
                     //means that this is a file in the tree that needs its name changed
                     try{
                         fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+changes[b].name);
@@ -51,10 +47,8 @@ app.post('/uploading', (req, res) => {
                     }
                 } else if (files[a].indexOf("tempfile")===0){
                     //file needs a random name
-                    console.log("entered random")
                     var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
                     uniqueName+=files[a].substring(files[a].indexOf("."));
-                    console.log(uniqueName);
                     try{
                         fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+uniqueName);
                     }catch (rE){
