@@ -21,8 +21,9 @@
       <label>Videos:</label>
       <input type="file" accept="video/*" name="videos" multiple id="videosInput">
       <br><br><br>
+      <input type="hidden" name="changes" id="changesE" value=""><br>
       <input style="position:relative;top:50px;" type="submit" value="Submit!">
-      <input type="hidden" name="changes" id="changesE">
+      
     </form>
     <br clear="all"><br><br>
     <div id="files"></div>
@@ -35,29 +36,7 @@
       document.getElementById("messageDiv").style.width=window.innerWidth+"px";
       document.getElementById("messageDiv").style.height=window.innerHeight+"px";
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has("destroy")){
-        var delM = document.createElement("p");
-        delM.style.position = "relative";
-        delM.style.top = window.innerHeight*0.5+"px";
-        delM.style.fontSize = "45px";
-        delM.id="deleteMessage";
-        delM.append("Deleted :)");
-
-        var center = document.createElement("center");
-        document.getElementById("messageDiv").appendChild(center);
-        center.appendChild(delM);
-        setTimeout(()=>{
-          var iter=0;
-          var interval = setInterval(()=>{
-            if (iter<=100){
-              document.getElementById("deleteMessage").style.opacity=100-1*iter+"%";
-              iter++;
-            } else {
-              clearInterval(interval);
-            }
-          },10)
-        },3000)
-      } else if (urlParams.has("badName")){
+      if (urlParams.has("badName")){
         var badNameM = document.createElement("p");
         badNameM.style.position = "relative";
         badNameM.style.top = window.innerHeight*0.5+"px";
@@ -113,29 +92,44 @@
           //oldN=fdsa.jpg
           //object.keys = ["screenshot123.jpg"]
           //object.values = ["fdsa.jpg"]
+
+
+          //sample json file:
+          /*
+          {
+            name:"michael.jpg"
+            originalName:"screenshot123.jpg"
+          }
+          */
+         //if the current name that is displaying and you clicked on is equal to the one in the array, rename that file
+         //if you cannot find the current name that is clicked in the array, make a new json file for the rename that is going to happen
           p.addEventListener("click", function(){
             function recurseNewName(e){
               var newName = prompt("What do you want to rename this file to?");
               if (newName !== null && newName.trim() !== "" && isNoSpChar(newName)){
+                newName = newName.trim();
                 var renames = document.getElementById("changesE").value;
-                var contents = JSON.parse(renames);
-                var oldN = e.innerHTML;
-                var ext = oldN.substring(oldN.indexOf("."));
-                var renamedObj = "{";
-                for (var a=0;a<Object.values(contents).length;a++){
-                  if (Object.values(contents)[i]===oldN){ //you want to see if the old name you are currently on is the same as an old name in the file w/ renamed
-                    //rename already exists @ pos i
-                    renamedObj += Object.keys(contents)[i]+":"+newName+ext;
+                var contents = renames==="" ? [] : JSON.parse(renames); //an array of renamed names
+                var ext = e.innerHTML.substring(e.innerHTML.indexOf(".")); //eg: .png  !w/ period!
+
+                //this step is only for selecting the json file to edit in the array
+                for (var i=0;i<contents.length;i++){
+                  if (e.innerHTML === contents[i].name){
+                    //exists
+                    contents[i].name = newName+ext;
                   } else {
-                    renamedObj += oldN+":"+newName+ext;
+                    //create new
+                    contents.push(JSON.parse("{'name':"+newName+ext+", 'originalName':"+e.innerHTML+"}"))
                   }
-                  renamedObj+=","
                 }
-                renamedObj=renamedObj.substring(0,renamedObj.length-1); //remove the extra comma
-                renamedObj+="}";
-                
+
+                if (contents.length===0){
+                  var jsonStr = "{\"name\":\""+newName+ext+"\", \"originalName\":\""+e.innerHTML+"\"}"
+                  console.log(jsonStr);
+                  contents.push(JSON.parse(jsonStr));
+                }
                 document.getElementById("changesE").value = "";
-                document.getElementById("changesE").value = renamedObj;
+                document.getElementById("changesE").value = JSON.stringify(contents);
                 e.innerHTML = "";
                 e.append(newName+ext);
               } else {

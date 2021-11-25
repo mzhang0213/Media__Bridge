@@ -12,7 +12,7 @@
     <font style="font-family: 'Cabin';">
       <h1 style="margin-left:10px;position:absolute;">Download Files!</h1>
       <br>
-      <h3 style="margin-left:10px;position:absolute;top:125px">/uploads</h3>
+      <a id="uploadLink" style="margin-left:10px;position:absolute;top:125px;font-size:20px;color:red;">/uploads</a>
       <br clear="all">
       <div id="one"></div>
       <div id="two"></div>
@@ -46,7 +46,40 @@
       gebi("one").style.bottom=0;
       gebi("two").style.right=0;
       gebi("two").style.bottom=0;
-      
+
+      gebi("uploadLink").href = window.location.origin+"/upload/";
+      gebi("uploadLink").style.zIndex = 10;
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has("destroy")){
+        var delM = document.createElement("p");
+        delM.style.position = "relative";
+        delM.style.top = window.innerHeight*0.5+"px";
+        delM.style.fontSize = "45px";
+        delM.id="deleteMessage";
+
+        if (urlParams.get("destroy")==="true"){
+          delM.append("Deleted :)");
+        } else if (urlParams.get("destroy")==="fail"){
+          delM.append("Couldn't delete file noooooooo :(:(");
+        }
+
+        var center = document.createElement("center");
+        document.getElementById("messageDiv").appendChild(center);
+        center.appendChild(delM);
+        setTimeout(()=>{
+          var iter=0;
+          var interval = setInterval(()=>{
+            if (iter<=100){
+              document.getElementById("deleteMessage").style.opacity=100-1*iter+"%";
+              iter++;
+            } else {
+              clearInterval(interval);
+            }
+          },10)
+        },3000)
+      }
+
       const loadMediaPlayer = function(file, type){ //file is the filename, type is png or jpg
         document.getElementById("two").innerHTML = "";
         var getFileType = function(type){
@@ -65,6 +98,7 @@
           buttonE.style.position = "relative";
           heights+=25;
           buttonE.style.top = heights+"px";
+          buttonE.style.border = "1px solid black";
           document.getElementById("two").appendChild(buttonE);
           buttonE.addEventListener("click", function(){
           var downloadMedia = document.createElement("a")
@@ -75,15 +109,20 @@
             document.body.removeChild(downloadMedia);
           })
           
+          var br = document.createElement("br");
+          br.clear="all";
+          document.getElementById("two").appendChild(br);
+
           var buttonD = document.createElement("button");
-          buttonD.append("Download");
+          buttonD.append("Delete");
           buttonD.style.height = "25px";
           buttonD.style.position = "relative";
           buttonD.style.backgroundColor = "red";
+          buttonD.style.border = "1px solid black";
           heights+=35;
           buttonD.style.top = heights+"px";
           document.getElementById("two").appendChild(buttonD);
-          buttonE.addEventListener("click", function(){
+          buttonD.addEventListener("click", function(){
             var formSubmit = document.createElement("form");
             formSubmit.action = "/destroy";
             formSubmit.method = "post";

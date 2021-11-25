@@ -4,21 +4,10 @@ const fs = require("fs");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, __dirname+/uploads/);
+        cb(null, __dirname+"/uploads/");
     },
     filename: function (req, file, cb) {
-        var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
-        
-        if (req.body.changes!==""){
-            var changes = JSON.parse(req.body.changes)
-            for (var i=0;i<Object.values(changes);i++){
-                if (Object.keys(changes)[i]===file.originalname){
-                    uniqueName = Object.values(changes)[i]
-                }
-            }
-        }
-        uniqueName = uniqueName.substring(uniqueName.length-10,uniqueName.length) + "."+ file.mimetype.substring(file.mimetype.indexOf("/")+1).toLowerCase();
-        cb(null, uniqueName);
+        cb(null, "tempfile"+file.originalname);
     }
 });
 
@@ -30,7 +19,7 @@ const PORT = process.env.PORT || 12232;
 app.use(express.static('public'));
 
 var pos = 0;
-const specialChars = "!@#$%^&*()-=_+[]{}|;':\".,<>/\?`~\\";
+const specialChars = "!@#$%^&*=+[]{}|;':\",.<>/\?`~\\";
 function isNoSpChar(str) {
     for (var i = 0; i < str.length; i++) {
         if (specialChars.indexOf(str.charAt(i)) !== -1) {
@@ -41,11 +30,41 @@ function isNoSpChar(str) {
 }
 
 app.post('/uploading', (req, res) => {
-    upload.fields([{name:"photos"},{name:"videos"},{name:"changes"}])(req, res, (multerErr)=>{
+    upload.fields([{name:"photos"},{name:"videos"}])(req, res, (multerErr)=>{
     if (multerErr){
       console.log("reeeeeeee" + multerErr);
     } else {
-      res.redirect("/download");
+        var files = fs.readdirSync("./uploads/");
+        console.log(req.body);
+        var changes = req.body.changes===""?"":JSON.parse(req.body.changes);
+        console.log(changes);
+        for (var a=0;a<files.length;a++){
+            var b=0;
+            do{
+                if((changes!=="")&&files[a].substring(8)===changes[b].originalName&&files[a].indexOf("tempfile")==0){
+                    console.log("\n","entered")
+                    //means that this is a file in the tree that needs its name changed
+                    try{
+                        fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+changes[b].name);
+                    }catch (rE){
+                        console.log("rename err: " + rE);
+                    }
+                } else if (files[a].indexOf("tempfile")===0){
+                    //file needs a random name
+                    console.log("entered random")
+                    var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
+                    uniqueName+=files[a].substring(files[a].indexOf("."));
+                    console.log(uniqueName);
+                    try{
+                        fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+uniqueName);
+                    }catch (rE){
+                        console.log("rename err: " + rE);
+                    }
+                }
+                b++;
+            }while(b<changes.length);
+        }
+        res.redirect("/download");
     }
 })  });
 
@@ -54,19 +73,18 @@ app.get("/getFiles", (req, res)=>{
         files:""
     }
     json.files = fs.readdirSync("./uploads");
-    console.log(json);
     res.send(JSON.stringify(json));
 })
 
-app.get("/destroy", upload.none(), (req,res)=>{
+app.post("/destroy", upload.none(), (req,res)=>{
   //file: req.body.fileName
   try {
     fs.unlinkSync(__dirname+"/uploads/"+req.body.fileName);
   } catch(e) {
     console.log("awejfiowj file del err: " + e);
-    res.redirect("./uploads/?destroy=fail");
+    res.redirect("./download/?destroy=fail");
   }
-  res.redirect("./uploads/?destroy=true");
+  res.redirect("./download/?destroy=true");
 })
 
 app.get("/uploads/*", (req, res)=>{
