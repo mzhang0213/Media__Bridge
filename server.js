@@ -46,7 +46,7 @@ app.post('/uploading', (req, res) => {
                     }
                 } else {
                     //file needs a random name
-                    var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
+                    var uniqueName = uniqueName.substring(uniqueName.length-10,uniqueName.length) + file.originalname.substring(file.originalname.length-4,file.originalname.length);
                     uniqueName+=files[a].substring(files[a].indexOf("."));
                     try{
                         fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+uniqueName);
