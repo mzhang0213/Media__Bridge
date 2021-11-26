@@ -113,21 +113,23 @@
                 var ext = e.innerHTML.substring(e.innerHTML.indexOf(".")); //eg: .png  !w/ period!
 
                 //this step is only for selecting the json file to edit in the array
-                for (var i=0;i<contents.length;i++){
+                var l = contents.length;
+                
+                var index = -1;
+                var i=0;
+                do {
+                  if (contents.length===0){
+                    break;
+                  }
                   if (e.innerHTML === contents[i].name){
                     //exists
-                    contents[i].name = newName+ext;
-                  } else {
-                    //create new
-                    contents.push(JSON.parse("{'name':"+newName+ext+", 'originalName':"+e.innerHTML+"}"))
+                    index=i;
                   }
-                }
-
-                if (contents.length===0){
-                  var jsonStr = "{\"name\":\""+newName+ext+"\", \"originalName\":\""+e.innerHTML+"\"}"
-                  console.log(jsonStr);
-                  contents.push(JSON.parse(jsonStr));
-                }
+                  i++
+                } while (i<l);
+                if (index!==-1)  contents[index].name = newName+ext
+                else  contents.push(JSON.parse("{\"name\":\""+newName+ext+"\", \"originalName\":\""+e.innerHTML+"\"}"));
+                
                 document.getElementById("changesE").value = "";
                 document.getElementById("changesE").value = JSON.stringify(contents);
                 e.innerHTML = "";

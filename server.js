@@ -36,27 +36,35 @@ app.post('/uploading', (req, res) => {
         var files = fs.readdirSync("./uploads/");
         var changes = req.body.changes===""?"":JSON.parse(req.body.changes);
         for (var a=0;a<files.length;a++){
+            var index = -1;
             var b=0;
             do{
-                if((changes!=="")&&files[a].substring(8)===changes[b].originalName&&files[a].indexOf("tempfile")==0){
-                    //means that this is a file in the tree that needs its name changed
-                    try{
-                        fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+changes[b].name);
-                    }catch (rE){
-                        console.log("rename err: " + rE);
-                    }
-                } else if (files[a].indexOf("tempfile")===0){
-                    //file needs a random name
-                    var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
-                    uniqueName+=files[a].substring(files[a].indexOf("."));
-                    try{
-                        fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+uniqueName);
-                    }catch (rE){
-                        console.log("rename err: " + rE);
+                //files: a, tempfilescreenshot190
+                if (files[a].indexOf("tempfile")===0){
+                    if((changes!=="")&&files[a].substring(8)===changes[b].originalName){
+                        index=b;
                     }
                 }
                 b++;
             }while(b<changes.length);
+
+            if (index!==-1){
+                //means that this is a file in the tree that needs its name changed
+                try{
+                    fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+changes[index].name);
+                }catch (rE){
+                    console.log("rename err: " + rE);
+                }
+            } else {
+                //file needs a random name
+                var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
+                uniqueName+=files[a].substring(files[a].indexOf("."));
+                try{
+                    fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+uniqueName);
+                }catch (rE){
+                    console.log("rename err: " + rE);
+                }
+            }
         }
         res.redirect("/download");
     }

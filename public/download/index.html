@@ -50,7 +50,7 @@
       gebi("uploadLink").href = window.location.origin+"/upload/";
       gebi("uploadLink").style.zIndex = 10;
 
-      const urlParams = new URLSearchParams(window.location.search);
+      var urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has("destroy")){
         var delM = document.createElement("p");
         delM.style.position = "relative";
@@ -65,7 +65,7 @@
         }
 
         var center = document.createElement("center");
-        document.getElementById("messageDiv").appendChild(center);
+        document.getElementById("one").appendChild(center);
         center.appendChild(delM);
         setTimeout(()=>{
           var iter=0;
@@ -75,9 +75,10 @@
               iter++;
             } else {
               clearInterval(interval);
+              center.remove();
             }
           },10)
-        },3000)
+        },2500)
       }
 
       const loadMediaPlayer = function(file, type){ //file is the filename, type is png or jpg
@@ -91,15 +92,13 @@
           }
         }
         
-        var createButtons = function(file){
+        var createButtons = function(file, container){
           var buttonE = document.createElement("button");
           buttonE.append("Download");
           buttonE.style.height = "25px";
           buttonE.style.position = "relative";
-          heights+=25;
-          buttonE.style.top = heights+"px";
           buttonE.style.border = "1px solid black";
-          document.getElementById("two").appendChild(buttonE);
+          container.appendChild(buttonE);
           buttonE.addEventListener("click", function(){
           var downloadMedia = document.createElement("a")
             downloadMedia.href = "http://"+document.location.host+"/uploads/"+file;
@@ -111,7 +110,7 @@
           
           var br = document.createElement("br");
           br.clear="all";
-          document.getElementById("two").appendChild(br);
+          container.appendChild(br);
 
           var buttonD = document.createElement("button");
           buttonD.append("Delete");
@@ -119,9 +118,7 @@
           buttonD.style.position = "relative";
           buttonD.style.backgroundColor = "red";
           buttonD.style.border = "1px solid black";
-          heights+=35;
-          buttonD.style.top = heights+"px";
-          document.getElementById("two").appendChild(buttonD);
+          container.appendChild(buttonD);
           buttonD.addEventListener("click", function(){
             var formSubmit = document.createElement("form");
             formSubmit.action = "/destroy";
@@ -139,15 +136,13 @@
           })
         }
         
-        var heights=0;
         if (getFileType(type.toLowerCase())==="image"){
           var container = document.createElement("div");
           var imgE = new Image();
           imgE.src = "http://"+document.location.host+"/uploads/"+file;
           imgE.onload = function(){
-            heights = 0;
-            imgE.style.width = imgE.naturalWidth*0.5+"px";
-            imgE.style.height = imgE.naturalHeight*0.5+"px";
+            imgE.style.maxWidth = "75vw"
+            imgE.style.maxHeight = "75vh"
 
             var desc = document.createElement("p");
             desc.style.margin=0;
@@ -158,17 +153,16 @@
             container.style.height=70+imgE.naturalHeight/2+"px";
             container.style.left=0;
             container.style.position="absolute";
-            container.style.top=heights+"px";
-            heights+=70+imgE.naturalHeight/2;
 
             container.appendChild(imgE);
             container.appendChild(desc);
             document.getElementById("two").appendChild(container);
-            document.getElementById("two").appendChild(document.createElement("br"));
+            container.appendChild(document.createElement("br"));
             desc.append("Original size: "+imgE.naturalWidth+"x"+imgE.naturalHeight);
             desc.append(document.createElement("br"));
             desc.append("Type: "+ type);
-            createButtons(file);
+            container.appendChild(document.createElement("br"));container.appendChild(document.createElement("br"));
+            createButtons(file, container);
           }
         } else if (getFileType(type.toLowerCase())==="video"){
           //FUKING GLITCHED
@@ -185,7 +179,6 @@
           videoE.addEventListener("loadedmetadata", function(){
             var inter = setInterval(function(){
               if (videoE.readyState===4){
-                heights = 0;
                 videoE.style.width = videoE.naturalWidth*0.5+"px";
                 videoE.style.height = videoE.naturalHeight*0.5+"px";
       
@@ -198,17 +191,16 @@
                 container.style.height=70+videoE.naturalHeight/2+"px";
                 container.style.left=0;
                 container.style.position="absolute";
-                container.style.top=heights+"px";
-                heights+=70+videoE.naturalHeight/2;
-      
+
                 container.appendChild(videoE);
                 container.appendChild(desc);
                 document.getElementById("two").appendChild(container);
-                document.getElementById("two").appendChild(document.createElement("br"));
+                container.appendChild(document.createElement("br"));
                 desc.append("Original size: "+videoE.naturalWidth+"x"+videoE.naturalHeight);
                 desc.append(document.createElement("br"));
                 desc.append("Type: "+ type);
-                createButtons(file);
+                container.appendChild(document.createElement("br"));container.appendChild(document.createElement("br"));
+                createButtons(file, container);
                 clearInterval(inter);
               }
             },250)
