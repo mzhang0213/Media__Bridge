@@ -18,19 +18,8 @@ const PORT = process.env.PORT || 12232;
 
 app.use(express.static('public'));
 
-var pos = 0;
-const specialChars = "!@#$%^&*=+[]{}|;':\",.<>/\?`~\\";
-function isNoSpChar(str) {
-    for (var i = 0; i < str.length; i++) {
-        if (specialChars.indexOf(str.charAt(i)) !== -1) {
-            return false;
-        }
-    }
-    return true;
-}
-
 app.post('/uploading', (req, res) => {
-    upload.fields([{name:"photos"},{name:"videos"}])(req, res, (multerErr)=>{
+    upload.fields([{name:"photos"},{name:"videos"},{name:"any"}])(req, res, (multerErr)=>{
     if (multerErr){
     } else {
         var files = fs.readdirSync("./uploads/");
@@ -39,7 +28,6 @@ app.post('/uploading', (req, res) => {
             var index = -1;
             var b=0;
             do{
-                //files: a, tempfilescreenshot190
                 if((changes!=="")&&files[a].substring(8)===changes[b].originalName){
                     index=b;
                 }

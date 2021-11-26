@@ -20,6 +20,9 @@
       <br>
       <label>Videos:</label>
       <input type="file" accept="video/*" name="videos" multiple id="videosInput">
+      <br>
+      <label>Or Anything!:</label>
+      <input type="file" accept="*" name="any" multiple id="anyInput">
       <br><br><br>
       <input type="hidden" name="changes" id="changesE" value=""><br>
       <input style="position:relative;top:50px;" type="submit" value="Submit!">
@@ -70,6 +73,45 @@
         return true;
       }
 
+      var renameEventListener = function(element){
+        element.addEventListener("click", function(){
+          function recurseNewName(e){
+            var newName = prompt("What do you want to rename this file to?");
+            if (newName !== null && newName.trim() !== "" && isNoSpChar(newName)){
+              newName = newName.trim();
+              var renames = document.getElementById("changesE").value;
+              var contents = renames==="" ? [] : JSON.parse(renames); //an array of renamed names
+              var ext = e.innerHTML.substring(e.innerHTML.indexOf(".")); //eg: .png  !w/ period!
+
+              //this step is only for selecting the json file to edit in the array
+              var l = contents.length;
+              
+              var index = -1;
+              var i=0;
+              do {
+                if (contents.length===0){
+                  break;
+                }
+                if (e.innerHTML === contents[i].name){
+                  //exists
+                  index=i;
+                }
+                i++
+              } while (i<l);
+              if (index!==-1)  contents[index].name = newName+ext
+              else  contents.push(JSON.parse("{\"name\":\""+newName+ext+"\", \"originalName\":\""+e.innerHTML+"\"}"));
+              
+              document.getElementById("changesE").value = "";
+              document.getElementById("changesE").value = JSON.stringify(contents);
+              e.innerHTML = "";
+              e.append(newName+ext);
+            } else {
+              recurseNewName(e);
+            }
+          };
+          recurseNewName(this);
+        })
+      }
       document.getElementById("photosInput").onchange = ()=>{
         document.getElementById("files").innerHTML = "";
         for (var i=0;i<document.getElementById("photosInput").files.length;i++){
@@ -78,68 +120,32 @@
           p.style.color = "darkBlue";
           p.id = "nameText" + i;
           document.getElementById("files").appendChild(p);
-
-          //display: screenshot123.jpg
-          //newname="fsda"
-          //renames=""
-          //contents={};
-          //oldN=screenshot123.jpg
-
-          //display: fdsa.jpg
-          //newname="asdf"
-          //renames="{screenshot123.jpg: fdsa.jpg}"
-          //contents={screenshot123.jpg: fdsa.jpg}
-          //oldN=fdsa.jpg
-          //object.keys = ["screenshot123.jpg"]
-          //object.values = ["fdsa.jpg"]
-
-
-          //sample json file:
-          /*
-          {
-            name:"michael.jpg"
-            originalName:"screenshot123.jpg"
-          }
-          */
-         //if the current name that is displaying and you clicked on is equal to the one in the array, rename that file
-         //if you cannot find the current name that is clicked in the array, make a new json file for the rename that is going to happen
-          p.addEventListener("click", function(){
-            function recurseNewName(e){
-              var newName = prompt("What do you want to rename this file to?");
-              if (newName !== null && newName.trim() !== "" && isNoSpChar(newName)){
-                newName = newName.trim();
-                var renames = document.getElementById("changesE").value;
-                var contents = renames==="" ? [] : JSON.parse(renames); //an array of renamed names
-                var ext = e.innerHTML.substring(e.innerHTML.indexOf(".")); //eg: .png  !w/ period!
-
-                //this step is only for selecting the json file to edit in the array
-                var l = contents.length;
-                
-                var index = -1;
-                var i=0;
-                do {
-                  if (contents.length===0){
-                    break;
-                  }
-                  if (e.innerHTML === contents[i].name){
-                    //exists
-                    index=i;
-                  }
-                  i++
-                } while (i<l);
-                if (index!==-1)  contents[index].name = newName+ext
-                else  contents.push(JSON.parse("{\"name\":\""+newName+ext+"\", \"originalName\":\""+e.innerHTML+"\"}"));
-                
-                document.getElementById("changesE").value = "";
-                document.getElementById("changesE").value = JSON.stringify(contents);
-                e.innerHTML = "";
-                e.append(newName+ext);
-              } else {
-                recurseNewName(e);
-              }
-            };
-            recurseNewName(this);
-          })
+          
+          renameEventListener(p);
+        }
+      }
+      document.getElementById("videosInput").onchange = ()=>{
+        document.getElementById("files").innerHTML = "";
+        for (var i=0;i<document.getElementById("videosInput").files.length;i++){
+          var p = document.createElement("p");
+          p.append(document.getElementById("videosInput").files[i].name);
+          p.style.color = "darkBlue";
+          p.id = "nameText" + i;
+          document.getElementById("files").appendChild(p);
+          
+          renameEventListener(p);
+        }
+      }
+      document.getElementById("anyInput").onchange = ()=>{
+        document.getElementById("files").innerHTML = "";
+        for (var i=0;i<document.getElementById("anyInput").files.length;i++){
+          var p = document.createElement("p");
+          p.append(document.getElementById("anyInput").files[i].name);
+          p.style.color = "darkBlue";
+          p.id = "nameText" + i;
+          document.getElementById("files").appendChild(p);
+          
+          renameEventListener(p);
         }
       }
     </script>
