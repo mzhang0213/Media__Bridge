@@ -40,29 +40,31 @@ app.post('/uploading', (req, res) => {
             var b=0;
             do{
                 //files: a, tempfilescreenshot190
-                if (files[a].indexOf("tempfile")===0){
-                    if((changes!=="")&&files[a].substring(8)===changes[b].originalName){
-                        index=b;
-                    }
+                if((changes!=="")&&files[a].substring(8)===changes[b].originalName){
+                    index=b;
                 }
                 b++;
             }while(b<changes.length);
 
-            if (index!==-1){
-                //means that this is a file in the tree that needs its name changed
-                try{
-                    fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+changes[index].name);
-                }catch (rE){
-                    console.log("rename err: " + rE);
-                }
-            } else {
-                //file needs a random name
-                var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
-                uniqueName+=files[a].substring(files[a].indexOf("."));
-                try{
-                    fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+uniqueName);
-                }catch (rE){
-                    console.log("rename err: " + rE);
+            if (files[a].indexOf("tempfile")===0){
+                console.log(files[a]);
+                if (index!==-1){
+                    console.log("rename, " + index);
+                    //means that this is a file in the tree that needs its name changed
+                    try{
+                        fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+changes[index].name);
+                    }catch (rE){
+                        console.log("rename err: " + rE);
+                    }
+                } else {
+                    //file needs a random name
+                    var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
+                    uniqueName+=files[a].substring(files[a].indexOf("."));
+                    try{
+                        fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+uniqueName);
+                    }catch (rE){
+                        console.log("rename err: " + rE);
+                    }
                 }
             }
         }
