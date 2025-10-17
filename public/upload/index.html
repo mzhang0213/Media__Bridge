@@ -14,21 +14,22 @@
   </style>
     <center>
     <h1>Upload Media</h1><br><br>
-    <form action="/uploading" method="post" enctype="multipart/form-data" id="mediaUpload">
-      <label>Images:</label>
-      <input type="file" accept="image/*" name="photos" multiple id="photosInput">
-      <br>
-      <label>Videos:</label>
-      <input type="file" accept="video/*" name="videos" multiple id="videosInput">
-      <br>
-      <label>Or Anything!:</label>
-      <input type="file" accept="*" name="any" multiple id="anyInput">
-      <br><br><br>
-      <input type="hidden" name="changes" id="changesE" value=""><br>
-      <input style="position:relative;top:50px;" type="submit" value="Submit!">
-      
-    </form>
-    <br clear="all"><br><br>
+    Random file names: <input id="norandom" type="checkbox">
+    <br><br>
+    <label>Images:</label>
+    <input type="file" accept="image/*" name="photos" multiple id="photosInput">
+    <br>
+    <label>Videos:</label>
+    <input type="file" accept="video/*" name="videos" multiple id="videosInput">
+    <br>
+    <label>Or Anything!:</label>
+    <input type="file" accept="*" name="any" multiple id="anyInput">
+    <br><br><br>
+    <input type="hidden" name="changes" id="changesE" value=""><br>
+    <button style="position:relative;top:50px;" id="submit">Submit!</button>
+    <br clear="all"><br><br><br><br><br><br>
+    <div id="photos"></div>
+    <div id="videos"></div>
     <div id="files"></div>
     </center>
     <div id="messageDiv" style="z-index:-10;"></div>
@@ -112,26 +113,33 @@
           recurseNewName(this);
         })
       }
+
+      var photoDates = []
+      var videoDates = []
       document.getElementById("photosInput").onchange = ()=>{
-        document.getElementById("files").innerHTML = "";
+        document.getElementById("photos").innerHTML = "";
+        photoDates = []
         for (var i=0;i<document.getElementById("photosInput").files.length;i++){
           var p = document.createElement("p");
-          p.append(document.getElementById("photosInput").files[i].name);
+          p.innerHTML = document.getElementById("photosInput").files[i].name + "  ["+new Date(document.getElementById("photosInput").files[i].lastModified)+"]";
+          photoDates.push(document.getElementById("photosInput").files[i].lastModified)
           p.style.color = "darkBlue";
           p.id = "nameText" + i;
-          document.getElementById("files").appendChild(p);
+          document.getElementById("photos").appendChild(p);
           
           renameEventListener(p);
         }
       }
       document.getElementById("videosInput").onchange = ()=>{
-        document.getElementById("files").innerHTML = "";
+        document.getElementById("videos").innerHTML = "";
+        videoDates = []
         for (var i=0;i<document.getElementById("videosInput").files.length;i++){
           var p = document.createElement("p");
-          p.append(document.getElementById("videosInput").files[i].name);
+          p.innerHTML = document.getElementById("videosInput").files[i].name + "  ["+new Date(document.getElementById("videosInput").files[i].lastModified)+"]";
+          videoDates.push(document.getElementById("videosInput").files[i].lastModified)
           p.style.color = "darkBlue";
           p.id = "nameText" + i;
-          document.getElementById("files").appendChild(p);
+          document.getElementById("videos").appendChild(p);
           
           renameEventListener(p);
         }
@@ -148,6 +156,66 @@
           renameEventListener(p);
         }
       }
+      document.getElementById("submit").addEventListener("click",function(){
+        var form = document.createElement("form");
+        form.action="/uploading";
+        form.method="post";
+        form.enctype="multipart/form-data";
+
+        var images = document.createElement("input");
+        images.type="file";
+        images.name="photos";
+        images.accept="image/*"
+        images.files=document.getElementById("photosInput").files;
+
+        var videos = document.createElement("input");
+        videos.type="file";
+        videos.name="videos";
+        videos.accept="video/*"
+        videos.files=document.getElementById("videosInput").files;
+
+        var anything = document.createElement("input");
+        anything.type="file";
+        anything.name="any";
+        anything.accept="*";
+        anything.files=document.getElementById("anyInput").files;
+
+        //<input type="hidden" name="changes" id="changesE" value=""><br>
+        var changes = document.createElement("input");
+        changes.type="hidden";
+        changes.name="changes";
+        changes.value=document.getElementById("changesE").value;
+
+        var norandom = document.createElement("input");
+        norandom.type="hidden";
+        norandom.name="norandom";
+        if (document.getElementById("norandom").checked)norandom.value="false";else norandom.value="true";
+
+        var allDates = []
+        //here add code that gets file name and is able to pair those with their dates
+        for (var i=0;i<photoDates.length+videoDates.length;i++) allDates.push([])
+        for (var i=0;i<photoDates.length;i++){
+          allDates[i].push(document.getElementById("photosInput").files[i].name)
+          allDates[i].push(photoDates[i])
+        }
+        for (var i=0;i<videoDates.length;i++){
+          allDates[i].push(document.getElementById("videosInput").files[i].name)
+          allDates[i].push(videoDates[i])
+        }
+        var dates = document.createElement("input");
+        dates.type="hidden"
+        dates.name="dates"
+        dates.value=JSON.stringify({dates:allDates})
+
+        form.appendChild(images);
+        form.appendChild(videos);
+        form.appendChild(dates);
+        form.appendChild(anything);
+        form.appendChild(norandom);
+        form.appendChild(changes);
+        document.body.appendChild(form);
+        form.submit();
+      })
     </script>
 </body>
 </html>

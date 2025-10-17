@@ -1,6 +1,16 @@
+
+
+/* use this:
+
+cloudflared tunnel run --token eyJhIjoiYjEwM2FlMDM1ODAwYWE5NjVjZWQyYWY2NWExNzlkOTgiLCJ0IjoiYWY0MmZmYjQtNzM4Yi00MzBkLTg4MzUtZDEzMjVlMGYxOWJiIiwicyI6Ik1EQXhaR0l4TlRjdE5EUTJOUzAwWW1ZNUxXRXhPVEV0TldJNU1qaGpaamhsTTJJeCJ9
+
+ */
+
+
 const express = require('express');
 const multer = require('multer');
 const fs = require("fs");
+const os = require("os");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -14,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const app = express();
-const PORT = process.env.PORT || 12232;
+const PORT = process.env.PORT || 12235;
 
 app.use(express.static('public'));
 
@@ -24,6 +34,8 @@ app.post('/uploading', (req, res) => {
     } else {
         var files = fs.readdirSync("./uploads/");
         var changes = req.body.changes===""?"":JSON.parse(req.body.changes);
+        var dates = JSON.parse(req.body.dates);
+        console.log(dates)
         for (var a=0;a<files.length;a++){
             var index = -1;
             var b=0;
@@ -44,12 +56,33 @@ app.post('/uploading', (req, res) => {
                     }catch (rE){
                         console.log("rename err: " + rE);
                     }
+                } else if (req.body.norandom==="true"){
+                    try{
+                        //files[a] is the direct name of the file +tempfile
+                        var raw = files[a].substring(files[a].indexOf("tempfile")+8);
+                        fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+raw);
+                        var place = 0;
+                        console.log("raw " + raw)
+                        for (var k=0;k<dates.dates.length;k++){
+                            console.log(dates.dates[k][0])
+                            if (dates.dates[k][0]===raw)place=k;
+                        }
+                        console.log(place)
+                        fs.utimesSync(__dirname+"/uploads/"+raw, dates.dates[place][1], dates.dates[place][1]);
+                    }catch (rE){
+                        console.log("rename err: " + rE);
+                    }
                 } else {
                     //file needs a random name
                     var uniqueName = (Date.now() + Math.round(Math.random() * 1E13)).toString();
                     uniqueName=uniqueName.substring(uniqueName.length-10,uniqueName.length)+files[a].substring(files[a].indexOf("."));
                     try{
                         fs.renameSync(__dirname+"/uploads/"+files[a], __dirname+"/uploads/"+uniqueName);
+                        var place = 0;
+                        for (var k=0;k<dates.dates.length;k++){
+                            if (dates.dates[k][0]===uniqueName)place=k;
+                        }
+                        fs.utimesSync(__dirname+"/uploads/"+raw, dates.dates[place][1], dates.dates[place][1]);
                     }catch (rE){
                         console.log("rename err: " + rE);
                     }
@@ -71,7 +104,7 @@ app.get("/getFiles", (req, res)=>{
 app.post("/destroy", upload.none(), (req,res)=>{
   //file: req.body.fileName
   try {
-    fs.unlinkSync(__dirname+"/uploads/"+req.body.fileName);
+    fs.unlinkSync(__dirname+"/uploads/"+decodeURI(req.body.fileName));
   } catch(e) {
     console.log("awejfiowj file del err: " + e);
     res.redirect("./download/?destroy=fail");
@@ -80,7 +113,7 @@ app.post("/destroy", upload.none(), (req,res)=>{
 })
 
 app.get("/uploads/*", (req, res)=>{
-    res.sendFile(__dirname+req.url.substring(req.url.indexOf("/uploads/")));
+    res.sendFile(__dirname+decodeURI(req.url.substring(req.url.indexOf("/uploads/"))));
 });
 
 app.get("/favicon.ico", (req,res)=>{
@@ -89,4 +122,5 @@ app.get("/favicon.ico", (req,res)=>{
 
 app.listen(PORT, () => {
     console.log('Listening at ' + PORT + "ee e ee e e e");
+    console.log(os.hostname());
 });

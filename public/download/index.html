@@ -8,7 +8,7 @@
     <link href='https://fonts.googleapis.com/css?family=Cabin' rel='stylesheet'>
   </head>
   <body>
-    
+
     <font style="font-family: 'Cabin';">
       <h1 style="margin-left:10px;position:absolute;">Download Files!</h1>
       <br>
@@ -91,7 +91,7 @@
             return "video";
           }
         }
-        
+
         var createButtons = function(file, container){
           var buttonE = document.createElement("button");
           buttonE.append("Download");
@@ -101,13 +101,13 @@
           container.appendChild(buttonE);
           buttonE.addEventListener("click", function(){
           var downloadMedia = document.createElement("a")
-            downloadMedia.href = "http://"+document.location.host+"/uploads/"+file;
+            downloadMedia.href = window.location.origin+"/uploads/"+file;
             downloadMedia.download = file.substring(0,file.indexOf("."));
             document.body.appendChild(downloadMedia);
             downloadMedia.click();
             document.body.removeChild(downloadMedia);
           })
-          
+
           var br = document.createElement("br");
           br.clear="all";
           container.appendChild(br);
@@ -124,22 +124,24 @@
             formSubmit.action = "/destroy";
             formSubmit.method = "post";
             formSubmit.enctype = "multipart/form-data";
-            
+
             var fileName = document.createElement("input");
             fileName.type = "hidden";
             fileName.name = "fileName";
             fileName.value = file;
-            
+
             formSubmit.appendChild(fileName);
             document.getElementById("two").appendChild(formSubmit);
             formSubmit.submit();
           })
         }
-        
+
         if (getFileType(type.toLowerCase())==="image"){
           var container = document.createElement("div");
           var imgE = new Image();
-          imgE.src = "http://"+document.location.host+"/uploads/"+file;
+          var theFileName = window.location.origin+"/uploads/"+decodeURI(file);
+          console.log(theFileName)
+          imgE.src = theFileName;
           imgE.onload = function(){
             imgE.style.maxWidth = "75vw"
             imgE.style.maxHeight = "75vh"
@@ -169,8 +171,8 @@
           var container = document.createElement("div");
           var videoE = document.createElement("video");
           var source = document.createElement("source");
-          
-          source.src = "http://"+document.location.host+"/uploads/"+file;
+
+          source.src = window.location.origin+"/uploads/"+decodeURI(file);
           videoE.controls = true;
           videoE.perload = "auto";
           videoE.appendChild(source);
@@ -181,7 +183,7 @@
               if (videoE.readyState===4){
                 videoE.style.width = videoE.naturalWidth*0.5+"px";
                 videoE.style.height = videoE.naturalHeight*0.5+"px";
-      
+
                 var desc = document.createElement("p");
                 desc.style.margin=0;
                 desc.style.padding=0;
@@ -209,10 +211,10 @@
           console.log("bad mimetype recognition reeeeeeee")
         }
       }
-      
+
       var files = [];
       var req = new XMLHttpRequest();
-      req.open("GET", "http://"+document.location.host+"/getFiles");
+      req.open("GET", window.location.origin+"/getFiles");
       req.send();
       req.onload = function(){
         if (req.readyState === 4){

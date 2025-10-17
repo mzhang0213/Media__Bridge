@@ -50,6 +50,7 @@
     gebi("downloader").addEventListener("click",()=>{
       window.location = "./download"
     })
+    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("destroy")){
       var delM = document.createElement("p");
       delM.style.position = "relative";
