@@ -3,248 +3,285 @@
 <!-- Downloads -->
 
 <html>
-  <head>
-    <title></title>
-    <link href='https://fonts.googleapis.com/css?family=Cabin' rel='stylesheet'>
-  </head>
-  <body>
+<head>
+  <title></title>
+  <link href='https://fonts.googleapis.com/css?family=Cabin' rel='stylesheet'>
+</head>
+<body>
 
-    <font style="font-family: 'Cabin';">
-      <h1 style="margin-left:10px;position:absolute;">Download Files!</h1>
-      <br>
-      <a id="uploadLink" style="margin-left:10px;position:absolute;top:125px;font-size:20px;color:red;">/uploads</a>
-      <br clear="all">
-      <div id="one"></div>
-      <div id="two"></div>
-    </font>
-    <style>
-      html{
-        width:0;
-        height:0;
-      }
-      body{
-        width:0;
-        height:0;
-      }
-      div{
-        position:absolute;
-        top:0;
-        left:0;
-        margin:0;
-        padding:0;
-      }
-      #two{
-        border-left:1px black solid;
-      }
-    </style>
-    <script>
-      const gebi = function(e){return document.getElementById(e)};
-      gebi("one").style.width=window.innerWidth*0.5-1+"px";gebi("one").style.height=window.innerHeight+"px";
-      gebi("two").style.width=window.innerWidth*0.5-1+"px";gebi("two").style.height=window.innerHeight+"px";
-      gebi("two").style.left=window.innerWidth*0.5-1+"px";
-      gebi("one").style.right=0;
-      gebi("one").style.bottom=0;
-      gebi("two").style.right=0;
-      gebi("two").style.bottom=0;
+<font style="font-family: 'Cabin';">
+  <h1 style="margin-left:10px;position:absolute;">Download Files!</h1>
+  <br>
+  <a id="uploadLink" style="margin-left:10px;position:absolute;top:125px;font-size:20px;color:red;">/uploads</a>
+  <br clear="all">
+  <div id="one"></div>
+  <div id="two"></div>
+</font>
+<style>
+  html {
+    width: 0;
+    height: 0;
+  }
 
-      gebi("uploadLink").href = window.location.origin+"/upload/";
-      gebi("uploadLink").style.zIndex = 10;
+  body {
+    width: 0;
+    height: 0;
+  }
 
-      var urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has("destroy")){
-        var delM = document.createElement("p");
-        delM.style.position = "relative";
-        delM.style.top = window.innerHeight*0.5+"px";
-        delM.style.fontSize = "45px";
-        delM.id="deleteMessage";
+  div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+  }
 
-        if (urlParams.get("destroy")==="true"){
-          delM.append("Deleted :)");
-        } else if (urlParams.get("destroy")==="fail"){
-          delM.append("Couldn't delete file noooooooo :(:(");
+  #two {
+    border-left: 1px black solid;
+  }
+</style>
+<script>
+  const gebi = function (e) {
+    return document.getElementById(e)
+  };
+  gebi("one").style.width = window.innerWidth * 0.5 - 1 + "px";
+  gebi("one").style.height = window.innerHeight + "px";
+  gebi("two").style.width = window.innerWidth * 0.5 - 1 + "px";
+  gebi("two").style.height = window.innerHeight + "px";
+  gebi("two").style.left = window.innerWidth * 0.5 - 1 + "px";
+  gebi("one").style.right = 0;
+  gebi("one").style.bottom = 0;
+  gebi("two").style.right = 0;
+  gebi("two").style.bottom = 0;
+
+  gebi("uploadLink").href = window.location.origin + "/upload/";
+  gebi("uploadLink").style.zIndex = 10;
+
+  var urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has("destroy")) {
+    var delM = document.createElement("p");
+    delM.style.position = "relative";
+    delM.style.top = window.innerHeight * 0.5 + "px";
+    delM.style.fontSize = "45px";
+    delM.id = "deleteMessage";
+
+    if (urlParams.get("destroy") === "true") {
+      delM.append("Deleted :)");
+    } else if (urlParams.get("destroy") === "fail") {
+      delM.append("Couldn't delete file noooooooo :(:(");
+    }
+
+    var center = document.createElement("center");
+    document.getElementById("one").appendChild(center);
+    center.appendChild(delM);
+    setTimeout(() => {
+      var iter = 0;
+      var interval = setInterval(() => {
+        if (iter <= 100) {
+          document.getElementById("deleteMessage").style.opacity = 100 - 1 * iter + "%";
+          iter++;
+        } else {
+          clearInterval(interval);
+          center.remove();
         }
+      }, 10)
+    }, 2500)
+  }
 
-        var center = document.createElement("center");
-        document.getElementById("one").appendChild(center);
-        center.appendChild(delM);
-        setTimeout(()=>{
-          var iter=0;
-          var interval = setInterval(()=>{
-            if (iter<=100){
-              document.getElementById("deleteMessage").style.opacity=100-1*iter+"%";
-              iter++;
-            } else {
-              clearInterval(interval);
-              center.remove();
-            }
-          },10)
-        },2500)
+  const loadMediaPlayer = function (file, type) { //file is the filename, type is png or jpg
+    document.getElementById("two").innerHTML = "";
+    var getFileType = function (type) {
+      if (type === "png" || type === "jpg" || type === "jpeg" || type === "heif" || type === "gif" || type === "bmp" || type === "tiff") {
+        return "image";
+      } else if (type === "pdf") {
+        return "pdf";
+      } else {
+        console.log("presumed video: " + type);
+        return "video";
       }
+    }
 
-      const loadMediaPlayer = function(file, type){ //file is the filename, type is png or jpg
-        document.getElementById("two").innerHTML = "";
-        var getFileType = function(type){
-          if (type ==="png"||type==="jpg"||type==="jpeg"||type==="heif"||type==="gif"||type==="bmp"||type==="tiff"){
-            return "image";
-          } else {
-            console.log("presumed video: " + type);
-            return "video";
-          }
-        }
+    var createButtons = function (file, container) {
+      var buttonE = document.createElement("button");
+      buttonE.append("Download");
+      buttonE.style.height = "25px";
+      buttonE.style.position = "relative";
+      buttonE.style.border = "1px solid black";
+      container.appendChild(buttonE);
+      buttonE.addEventListener("click", function () {
+        var downloadMedia = document.createElement("a")
+        downloadMedia.href = window.location.origin + "/uploads/" + file;
+        downloadMedia.download = file.substring(0, file.indexOf("."));
+        document.body.appendChild(downloadMedia);
+        downloadMedia.click();
+        document.body.removeChild(downloadMedia);
+      })
 
-        var createButtons = function(file, container){
-          var buttonE = document.createElement("button");
-          buttonE.append("Download");
-          buttonE.style.height = "25px";
-          buttonE.style.position = "relative";
-          buttonE.style.border = "1px solid black";
-          container.appendChild(buttonE);
-          buttonE.addEventListener("click", function(){
-          var downloadMedia = document.createElement("a")
-            downloadMedia.href = window.location.origin+"/uploads/"+file;
-            downloadMedia.download = file.substring(0,file.indexOf("."));
-            document.body.appendChild(downloadMedia);
-            downloadMedia.click();
-            document.body.removeChild(downloadMedia);
-          })
+      var br = document.createElement("br");
+      br.clear = "all";
+      container.appendChild(br);
 
-          var br = document.createElement("br");
-          br.clear="all";
-          container.appendChild(br);
+      var buttonD = document.createElement("button");
+      buttonD.append("Delete");
+      buttonD.style.height = "25px";
+      buttonD.style.position = "relative";
+      buttonD.style.backgroundColor = "red";
+      buttonD.style.border = "1px solid black";
+      container.appendChild(buttonD);
+      buttonD.addEventListener("click", function () {
+        var formSubmit = document.createElement("form");
+        formSubmit.action = "/destroy";
+        formSubmit.method = "post";
+        formSubmit.enctype = "multipart/form-data";
 
-          var buttonD = document.createElement("button");
-          buttonD.append("Delete");
-          buttonD.style.height = "25px";
-          buttonD.style.position = "relative";
-          buttonD.style.backgroundColor = "red";
-          buttonD.style.border = "1px solid black";
-          container.appendChild(buttonD);
-          buttonD.addEventListener("click", function(){
-            var formSubmit = document.createElement("form");
-            formSubmit.action = "/destroy";
-            formSubmit.method = "post";
-            formSubmit.enctype = "multipart/form-data";
+        var fileName = document.createElement("input");
+        fileName.type = "hidden";
+        fileName.name = "fileName";
+        fileName.value = file;
 
-            var fileName = document.createElement("input");
-            fileName.type = "hidden";
-            fileName.name = "fileName";
-            fileName.value = file;
+        formSubmit.appendChild(fileName);
+        document.getElementById("two").appendChild(formSubmit);
+        formSubmit.submit();
+      })
+    }
 
-            formSubmit.appendChild(fileName);
-            document.getElementById("two").appendChild(formSubmit);
-            formSubmit.submit();
-          })
-        }
+    if (getFileType(type.toLowerCase()) === "image") {
+      var container = document.createElement("div");
+      var imgE = new Image();
+      var theFileName = window.location.origin + "/uploads/" + decodeURI(file);
+      console.log(theFileName)
+      imgE.src = theFileName;
+      imgE.onload = function () {
+        imgE.style.maxWidth = "75vw"
+        imgE.style.maxHeight = "75vh"
 
-        if (getFileType(type.toLowerCase())==="image"){
-          var container = document.createElement("div");
-          var imgE = new Image();
-          var theFileName = window.location.origin+"/uploads/"+decodeURI(file);
-          console.log(theFileName)
-          imgE.src = theFileName;
-          imgE.onload = function(){
-            imgE.style.maxWidth = "75vw"
-            imgE.style.maxHeight = "75vh"
+        var desc = document.createElement("p");
+        desc.style.margin = 0;
+        desc.style.padding = 0;
+        desc.style.height = 30 + "px";
+        desc.style.fontSize = 25 + "px";
+        container.style.width = document.getElementById("two").width + "px";
+        container.style.height = 70 + imgE.naturalHeight / 2 + "px";
+        container.style.left = 0;
+        container.style.position = "absolute";
+
+        container.appendChild(imgE);
+        container.appendChild(desc);
+        document.getElementById("two").appendChild(container);
+        container.appendChild(document.createElement("br"));
+        desc.append("Original size: " + imgE.naturalWidth + "x" + imgE.naturalHeight);
+        desc.append(document.createElement("br"));
+        desc.append("Type: " + type);
+        container.appendChild(document.createElement("br"));
+        container.appendChild(document.createElement("br"));
+        createButtons(file, container);
+      }
+    } else if (getFileType(type.toLowerCase()) === "pdf") {
+      var container = document.createElement("div");
+      var pdfEmbed = document.createElement("embed");
+
+      pdfEmbed.src = window.location.origin + "/uploads/" + decodeURI(file);
+      pdfEmbed.type = "application/pdf";
+      pdfEmbed.style.width = window.innerWidth * 0.45 + "px";
+      pdfEmbed.style.height = window.innerHeight * 0.75 + "px";
+
+      var desc = document.createElement("p");
+      desc.style.margin = 0;
+      desc.style.padding = 0;
+      desc.style.height = 30 + "px";
+      desc.style.fontSize = 25 + "px";
+      container.style.width = document.getElementById("two") + "px";
+      container.style.left = 0;
+      container.style.position = "absolute";
+
+      container.appendChild(pdfEmbed);
+      container.appendChild(desc);
+      document.getElementById("two").appendChild(container);
+      container.appendChild(document.createElement("br"));
+      desc.append("Type: PDF");
+      container.appendChild(document.createElement("br"));
+      container.appendChild(document.createElement("br"));
+      createButtons(file, container);
+    } else if (getFileType(type.toLowerCase()) === "video") {
+      //FUKING GLITCHED
+      var container = document.createElement("div");
+      var videoE = document.createElement("video");
+      var source = document.createElement("source");
+
+      source.src = window.location.origin + "/uploads/" + decodeURI(file);
+      videoE.controls = true;
+      videoE.perload = "auto";
+      videoE.appendChild(source);
+
+      videoE.load();
+      videoE.addEventListener("loadedmetadata", function () {
+        var inter = setInterval(function () {
+          if (videoE.readyState === 4) {
+            videoE.style.width = videoE.naturalWidth * 0.5 + "px";
+            videoE.style.height = videoE.naturalHeight * 0.5 + "px";
 
             var desc = document.createElement("p");
-            desc.style.margin=0;
-            desc.style.padding=0;
-            desc.style.height=30+"px";
-            desc.style.fontSize=25+"px";
-            container.style.width=document.getElementById("two").width+"px";
-            container.style.height=70+imgE.naturalHeight/2+"px";
-            container.style.left=0;
-            container.style.position="absolute";
+            desc.style.margin = 0;
+            desc.style.padding = 0;
+            desc.style.height = 30 + "px";
+            desc.style.fontSize = 25 + "px";
+            container.style.width = document.getElementById("two") + "px";
+            container.style.height = 70 + videoE.naturalHeight / 2 + "px";
+            container.style.left = 0;
+            container.style.position = "absolute";
 
-            container.appendChild(imgE);
+            container.appendChild(videoE);
             container.appendChild(desc);
             document.getElementById("two").appendChild(container);
             container.appendChild(document.createElement("br"));
-            desc.append("Original size: "+imgE.naturalWidth+"x"+imgE.naturalHeight);
+            desc.append("Original size: " + videoE.naturalWidth + "x" + videoE.naturalHeight);
             desc.append(document.createElement("br"));
-            desc.append("Type: "+ type);
-            container.appendChild(document.createElement("br"));container.appendChild(document.createElement("br"));
+            desc.append("Type: " + type);
+            container.appendChild(document.createElement("br"));
+            container.appendChild(document.createElement("br"));
             createButtons(file, container);
+            clearInterval(inter);
           }
-        } else if (getFileType(type.toLowerCase())==="video"){
-          //FUKING GLITCHED
-          var container = document.createElement("div");
-          var videoE = document.createElement("video");
-          var source = document.createElement("source");
+        }, 250)
+      })
+    } else {
+      console.log("bad mimetype recognition reeeeeeee")
+    }
+  }
 
-          source.src = window.location.origin+"/uploads/"+decodeURI(file);
-          videoE.controls = true;
-          videoE.perload = "auto";
-          videoE.appendChild(source);
-
-          videoE.load();
-          videoE.addEventListener("loadedmetadata", function(){
-            var inter = setInterval(function(){
-              if (videoE.readyState===4){
-                videoE.style.width = videoE.naturalWidth*0.5+"px";
-                videoE.style.height = videoE.naturalHeight*0.5+"px";
-
-                var desc = document.createElement("p");
-                desc.style.margin=0;
-                desc.style.padding=0;
-                desc.style.height=30+"px";
-                desc.style.fontSize=25+"px";
-                container.style.width=document.getElementById("two")+"px";
-                container.style.height=70+videoE.naturalHeight/2+"px";
-                container.style.left=0;
-                container.style.position="absolute";
-
-                container.appendChild(videoE);
-                container.appendChild(desc);
-                document.getElementById("two").appendChild(container);
-                container.appendChild(document.createElement("br"));
-                desc.append("Original size: "+videoE.naturalWidth+"x"+videoE.naturalHeight);
-                desc.append(document.createElement("br"));
-                desc.append("Type: "+ type);
-                container.appendChild(document.createElement("br"));container.appendChild(document.createElement("br"));
-                createButtons(file, container);
-                clearInterval(inter);
-              }
-            },250)
-          })
-        } else {
-          console.log("bad mimetype recognition reeeeeeee")
-        }
+  var files = [];
+  var req = new XMLHttpRequest();
+  req.open("GET", window.location.origin + "/getFiles");
+  req.send();
+  req.onload = function () {
+    if (req.readyState === 4) {
+      var json = JSON.parse(req.responseText);
+      for (var i = 0; i < json.files.length; i++) {
+        files.push(json.files[i]);
+        console.log(files);
       }
-
-      var files = [];
-      var req = new XMLHttpRequest();
-      req.open("GET", window.location.origin+"/getFiles");
-      req.send();
-      req.onload = function(){
-        if (req.readyState === 4){
-          var json = JSON.parse(req.responseText);
-  		    for (var i=0;i<json.files.length;i++){
-  		      files.push(json.files[i]);
-            console.log(files);
-  		    }
-          var heights = 175;
-          for (var i=0;i<files.length;i++){
-            var p = document.createElement("p");
-            p.style.fontSize="20px";
-            p.style.color="blue";
-            p.style.margin = 0;
-            p.style.marginLeft = "40px";
-            p.style.padding = 0;
-            p.style.width = 0;
-            p.style.top=heights+"px";
-            p.style.position="relative";
-            p.append(files[i]);
-            document.getElementById("one").appendChild(p);
-            p.addEventListener("click", function(){
-              loadMediaPlayer(this.innerHTML, this.innerHTML.substring(this.innerHTML.indexOf(".")+1));
-            })
-            heights+=22;
-          }
-  		  } else {
-  		    console.log("not ready err")
-  		  }
+      var heights = 175;
+      for (var i = 0; i < files.length; i++) {
+        var p = document.createElement("p");
+        p.style.fontSize = "20px";
+        p.style.color = "blue";
+        p.style.margin = 0;
+        p.style.marginLeft = "40px";
+        p.style.padding = 0;
+        p.style.width = 0;
+        p.style.top = heights + "px";
+        p.style.position = "relative";
+        p.append(files[i]);
+        document.getElementById("one").appendChild(p);
+        p.addEventListener("click", function () {
+          loadMediaPlayer(this.innerHTML, this.innerHTML.substring(this.innerHTML.indexOf(".") + 1));
+        })
+        heights += 22;
       }
-    </script>
-  </body>
+    } else {
+      console.log("not ready err")
+    }
+  }
+</script>
+</body>
 </html>
