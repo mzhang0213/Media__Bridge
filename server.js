@@ -1,16 +1,8 @@
-
-
-/* use this:
-
-cloudflared tunnel run --token eyJhIjoiYjEwM2FlMDM1ODAwYWE5NjVjZWQyYWY2NWExNzlkOTgiLCJ0IjoiYWY0MmZmYjQtNzM4Yi00MzBkLTg4MzUtZDEzMjVlMGYxOWJiIiwicyI6Ik1EQXhaR0l4TlRjdE5EUTJOUzAwWW1ZNUxXRXhPVEV0TldJNU1qaGpaamhsTTJJeCJ9
-
- */
-
-
 const express = require('express');
 const multer = require('multer');
 const fs = require("fs");
 const os = require("os");
+process.loadEnvFile();
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -24,7 +16,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const app = express();
-const PORT = process.env.PORT || 12235;
+const PORT = process.env.PORT;
 
 app.use(express.static('public'));
 
