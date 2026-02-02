@@ -91,17 +91,61 @@
   const loadMediaPlayer = function (file, type) { //file is the filename, type is png or jpg
     document.getElementById("two").innerHTML = "";
     var getFileType = function (type) {
-      if (type === "png" || type === "jpg" || type === "jpeg" || type === "heif" || type === "gif" || type === "bmp" || type === "tiff") {
+      type = type.toLowerCase();
+      
+      // Image formats
+      if (["png", "jpg", "jpeg", "gif", "bmp", "tiff", "svg", "webp"].includes(type)) {
         return "image";
-      } else if (type === "pdf") {
-        return "pdf";
-      } else {
-        console.log("presumed video: " + type);
+      } 
+      // Video formats
+      else if (["mp4", "mov", "avi", "wmv", "flv", "webm", "mpeg", "mpg", "mkv"].includes(type)) {
         return "video";
+      } 
+      // Audio formats
+      else if (["mp3", "wav", "ogg", "flac", "aac", "m4a"].includes(type)) {
+        return "audio";
+      }
+      // PDF
+      else if (type === "pdf") {
+        return "pdf";
+      }
+      // Document formats
+      else if (["doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "odp"].includes(type)) {
+        return "document";
+      }
+      // Text formats
+      else if (["txt", "md", "csv", "json", "xml", "html", "htm", "css", "js", "py", "java", "cpp", "c", "h", "php", "sql", "log", "yaml", "yml", "ini", "conf"].includes(type)) {
+        return "text";
+      }
+      // Archive formats
+      else if (["zip", "rar", "tar", "gz", "7z", "bz2", "xz"].includes(type)) {
+        return "archive";
+      }
+      // Executable formats
+      else if (["exe", "dmg", "app", "apk", "bat", "sh", "msi"].includes(type)) {
+        return "executable";
+      }
+      // Other formats (no preview)
+      else {
+        return "other";
       }
     }
 
     var createButtons = function (file, container) {
+      var buttonLink = document.createElement("button");
+      buttonLink.append("link to file");
+      buttonLink.style.height = "25px";
+      buttonLink.style.fontSize = "20px";
+      buttonLink.style.color = "blue";
+      buttonLink.style.right = "0";
+      buttonLink.style.top = "0";
+      buttonLink.style.position = "absolute";
+      buttonLink.style.border = "1px solid black";
+      gebi("two").appendChild(buttonLink);
+      buttonLink.addEventListener("click", function () {
+        window.location = window.location.origin + "/uploads/" + file;
+      })
+
       var buttonE = document.createElement("button");
       buttonE.append("Download");
       buttonE.style.height = "25px";
@@ -190,7 +234,7 @@
       desc.style.padding = 0;
       desc.style.height = 30 + "px";
       desc.style.fontSize = 25 + "px";
-      container.style.width = document.getElementById("two") + "px";
+      container.style.width = window.innerWidth * 0.45 + "px";
       container.style.left = 0;
       container.style.position = "absolute";
 
@@ -225,7 +269,7 @@
             desc.style.padding = 0;
             desc.style.height = 30 + "px";
             desc.style.fontSize = 25 + "px";
-            container.style.width = document.getElementById("two") + "px";
+            container.style.width = window.innerWidth * 0.45 + "px";
             container.style.height = 70 + videoE.naturalHeight / 2 + "px";
             container.style.left = 0;
             container.style.position = "absolute";
@@ -244,8 +288,117 @@
           }
         }, 250)
       })
+    } else if (getFileType(type.toLowerCase()) === "audio") {
+      var container = document.createElement("div");
+      var audioE = document.createElement("audio");
+      var source = document.createElement("source");
+
+      source.src = window.location.origin + "/uploads/" + decodeURI(file);
+      audioE.controls = true;
+      audioE.appendChild(source);
+
+      var desc = document.createElement("p");
+      desc.style.margin = 0;
+      desc.style.padding = 0;
+      desc.style.height = 30 + "px";
+      desc.style.fontSize = 25 + "px";
+      container.style.width = window.innerWidth * 0.45 + "px";
+      container.style.left = 0;
+      container.style.position = "absolute";
+
+      container.appendChild(audioE);
+      container.appendChild(desc);
+      document.getElementById("two").appendChild(container);
+      container.appendChild(document.createElement("br"));
+      desc.append("Type: " + type);
+      container.appendChild(document.createElement("br"));
+      container.appendChild(document.createElement("br"));
+      createButtons(file, container);
+    } else if (getFileType(type.toLowerCase()) === "document") {
+      // For document files, show download button without preview
+      var container = document.createElement("div");
+      
+      var desc = document.createElement("p");
+      desc.style.margin = 0;
+      desc.style.padding = 0;
+      desc.style.height = 30 + "px";
+      desc.style.fontSize = 25 + "px";
+      container.style.width = window.innerWidth * 0.45 + "px";
+      container.style.left = 0;
+      container.style.position = "absolute";
+      
+      desc.append("Document file: " + file);
+      container.appendChild(desc);
+      document.getElementById("two").appendChild(container);
+      container.appendChild(document.createElement("br"));
+      desc.append(document.createElement("br"));
+      desc.append("Type: " + type);
+      container.appendChild(document.createElement("br"));
+      container.appendChild(document.createElement("br"));
+      createButtons(file, container);
+    } else if (getFileType(type.toLowerCase()) === "text") {
+      var container = document.createElement("div");
+      
+      // Try to load text content in a pre element
+      var textPreview = document.createElement("pre");
+      textPreview.style.maxWidth = "90%";
+      textPreview.style.maxHeight = "70vh";
+      textPreview.style.overflow = "auto";
+      textPreview.style.border = "1px solid #ccc";
+      textPreview.style.padding = "10px";
+      
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", window.location.origin + "/uploads/" + decodeURI(file), true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          textPreview.textContent = xhr.responseText;
+        } else if (xhr.readyState === 4) {
+          textPreview.textContent = "Could not load text file preview";
+        }
+      };
+      xhr.send();
+      
+      var desc = document.createElement("p");
+      desc.style.margin = 0;
+      desc.style.padding = 0;
+      desc.style.height = 30 + "px";
+      desc.style.fontSize = 25 + "px";
+      container.style.width = window.innerWidth * 0.45 + "px";
+      container.style.left = 0;
+      container.style.position = "absolute";
+      
+      container.appendChild(textPreview);
+      container.appendChild(desc);
+      document.getElementById("two").appendChild(container);
+      container.appendChild(document.createElement("br"));
+      desc.append("Type: " + type);
+      container.appendChild(document.createElement("br"));
+      container.appendChild(document.createElement("br"));
+      createButtons(file, container);
+    } else if (getFileType(type.toLowerCase()) === "archive" || getFileType(type.toLowerCase()) === "executable" || getFileType(type.toLowerCase()) === "other") {
+      // For files with no preview capability, show just the download/delete buttons
+      var container = document.createElement("div");
+      
+      var desc = document.createElement("p");
+      desc.style.margin = 0;
+      desc.style.padding = 0;
+      desc.style.height = 30 + "px";
+      desc.style.fontSize = 25 + "px";
+      container.style.width = window.innerWidth * 0.45 + "px";
+      container.style.left = 0;
+      container.style.position = "absolute";
+      
+      desc.append("File: " + file);
+      container.appendChild(desc);
+      document.getElementById("two").appendChild(container);
+      container.appendChild(document.createElement("br"));
+      desc.append(document.createElement("br"));
+      desc.append("Type: " + type);
+      container.appendChild(document.createElement("br"));
+      container.appendChild(document.createElement("br"));
+      createButtons(file, container);
     } else {
-      console.log("bad mimetype recognition reeeeeeee")
+      console.log("bad mimetype recognition reeeeeeee");
     }
   }
 
